@@ -1,0 +1,119 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Your Dashboard{% endblock %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+        
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm rounded mb-4 p-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                    💹 CryptoDashboard
+                </a>
+                
+                <div class="d-flex align-items-center">
+                    
+                    <div class="form-check form-switch me-3">
+                        <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                        <label class="form-check-label" for="darkModeToggle">☀️/🌙</label>
+                    </div>
+                    
+                    <form method="post" action="{% url 'logout' %}" class="d-flex">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Log Out</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row g-4">
+            
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title">Your Total Portfolio Value</h3>
+                        <div class="display-4 fw-bold text-primary my-3">
+                            ${{ total_value|floatformat:2 }}
+                        </div>
+
+                        <h2 class="h4 mt-5">Your Holdings</h2>
+                        
+                        {% if items %}
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Coin</th>
+                                        <th>Amount Owned</th>
+                                        <th>Current Price</th>
+                                        <th>Current Value</th>
+                                        <th>Actions</th> </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                        <tr>
+                                            <td class="text-capitalize fw-bold">{{ item.coin_id }}</td>
+                                            <td>{{ item.amount|floatformat:8 }}</td>
+                                            <td>${{ item.current_price|floatformat:2 }}</td>
+                                            <td><b>${{ item.current_value|floatformat:2 }}</b></td>
+                                            <td>
+                                                <form method="post" action="{% url 'delete_item' item.pk %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="alert alert-info">
+                                You don't have any coins in your portfolio yet. Add one!
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h4">Add a Coin</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="{{ add_coin_form.coin_id.id_for_label }}" class="form-label">Coin ID</label>
+                                {{ add_coin_form.coin_id }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ add_coin_form.amount.id_for_label }}" class="form-label">Amount</label>
+                                {{ add_coin_form.amount }}
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100">Add to Portfolio</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    {% else %}
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card shadow-sm text-center p-4">
+                    <div class="card-body">
+                        <h1 class="card-title h2">Welcome to CryptoDashboard</h1>
+                        <p class="lead">Please log in or sign up to view your portfolio.</p>
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-2">Log In</a>
+                        <a href="{% url 'signup' %}" class="btn btn-success btn-lg">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

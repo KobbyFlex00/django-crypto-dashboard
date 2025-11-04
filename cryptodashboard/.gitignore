@@ -1,0 +1,25 @@
+# --- .gitignore ---
+
+# Python
+__pycache__/
+*.pyc
+
+# Django
+*.log
+
+# Database
+# This prevents leaking your user data and portfolios
+db.sqlite3
+
+# Virtual Environment
+# This is your personal machine's environment, never upload it
+venv/
+.venv/
+
+# Secrets File
+# This is the most important one!
+.env
+
+# Static files (if you collect them)
+staticfiles/
+media/
